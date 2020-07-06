@@ -1,7 +1,10 @@
 <template>
     <v-card color="basil">
     <v-card-title class="text-center justify-center py-6">
-      <h1 class="font-weight-bold display-3 basil--text">Profile</h1>
+    <div>
+        <h1 class="font-weight-bold display-3 basil--text">Profile</h1>
+        <p><a @click="logout()">Logout</a></p>
+    </div>
     </v-card-title>
 
     <v-tabs
@@ -45,6 +48,11 @@
         ],
         text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
       }
+    },
+    methods: {
+        logout () {
+            this.$store.dispatch('logout')
+        }
     },
   }
 </script>

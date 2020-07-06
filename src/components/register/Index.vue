@@ -1,7 +1,6 @@
 <template>
 <div class="box-auth">
 <h1 v-if="otpForm == false">Register</h1>
-<v-btn @click="coba()" color="success">Coba</v-btn>
   <v-row justify="center" v-if="otpForm == false">
     <v-form
       ref="form"
@@ -50,6 +49,7 @@
       >
         Submit
       </v-btn>
+      <p class="mt-2">Sudah punya akun? <router-link :to="{ name: 'Login' }">Login</router-link></p>
     </v-form>
   </v-row>
   <Otp v-if="otpForm" :otpDataUser="otpDataUser"/>
@@ -90,9 +90,6 @@ import Otp from './Otp.vue'
       validate () {
         this.$refs.form.validate()
       },
-      coba () {
-            this.$store.commit('setToken',{token: 'cek123'})
-      },
       register () {
           axios
           .post('/api/v1/register',
@@ -101,7 +98,7 @@ import Otp from './Otp.vue'
             password: this.password,
             country: 'Indonesia',
             latlong: '123',
-            device_token: '1234',
+            device_token: '123',
             device_type: '2'
           })
           .then(response => {

@@ -8,19 +8,28 @@ export const routes = [
                 path: 'register',
                 component: () => import(/* webpackChunkName: "register" */
                     './components/register/Index.vue'),
-                name: 'Register'
+                name: 'Register',
+                meta: {
+                    auth: false
+                }
             },
             {
                 path: '',
                 component: () => import(/* webpackChunkName: "login" */
                     './components/login/Index.vue'),
-                name: 'Login'
+                name: 'Login',
+                meta: {
+                    auth: false
+                }
             },
             {
                 path: 'main',
                 component: () => import(/* webpackChunkName: "home" */
                     './components/home/Index.vue'),
-                name: 'Home'
+                name: 'Home',
+                meta: {
+                    auth: true,
+                },
             }
         ]
     },

@@ -15,16 +15,16 @@ export default new Vuex.Store({
             localStorage.setItem('token', JSON.stringify(token.token))
         },
 
-        // clearUserData() {
-        //     localStorage.removeItem('token')
-        //     location.reload()
-        // }
+        clearToken() {
+            localStorage.removeItem('token')
+            location.reload()
+        }
     },
 
     actions: {
-        // logout({ commit }) {
-        //     commit('clearUserData')
-        // }
+        logout({ commit }) {
+            commit('clearToken')
+        }
     },
 
     getters: {
