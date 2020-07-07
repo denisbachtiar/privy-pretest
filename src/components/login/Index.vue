@@ -21,6 +21,8 @@
         v-model="nohp"
         :rules="noHpRules"
         label="No Handphone"
+        placeholder="0811xxxxxxx"
+        prepend-inner-icon="mdi-phone"
         required
       ></v-text-field>
 
@@ -121,5 +123,11 @@ import axios from 'axios'
     }
     .v-form {
         min-width: 30%;
+    }
+    .mdi-phone::before {
+        content: "+62";
+        font-size: medium !important;
+        color: coral;
+        margin-top: -2px;
     }
 </style>

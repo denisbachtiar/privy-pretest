@@ -6,6 +6,7 @@ import { routes } from "./routes"
 import store from "./store"
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
+import '@mdi/font/css/materialdesignicons.css'
 // import AxiosPlugin from 'vue-axios-cors';
 
 // Vue.use(AxiosPlugin)

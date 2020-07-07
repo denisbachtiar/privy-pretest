@@ -21,6 +21,8 @@
         v-model="nohp"
         :rules="noHpRules"
         label="No Handphone"
+        prepend-inner-icon="mdi-phone"
+        placeholder="0811xxxxxxx"
         required
       ></v-text-field>
 
@@ -128,5 +130,11 @@ import Otp from './Otp.vue'
     }
     .v-form {
         min-width: 30%;
+    }
+    .mdi-phone::before {
+        content: "+62";
+        font-size: medium !important;
+        color: coral;
+        margin-top: -2px;
     }
 </style>
