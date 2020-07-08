@@ -16,7 +16,13 @@
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
       <v-btn class="ma-2 btn-logout" fab small v-bind="attrs" v-on="on" @click="logout()" color="red" dark>
-        <v-icon dark>mdi-logout</v-icon>
+      <v-progress-circular
+        indeterminate
+        size="20"
+        color="white"
+        v-if="loading"
+        ></v-progress-circular>
+        <v-icon v-else dark>mdi-logout</v-icon>
       </v-btn>
         </template>
       <span>Logout</span>
@@ -98,7 +104,8 @@ import Messages from './Messages'
           'Profile', 'Educations', 'Career'
         ],
         userData: {},
-        imgCover: null
+        imgCover: null,
+        loading: false
       }
     },
     created() {
@@ -126,6 +133,7 @@ import Messages from './Messages'
             })
         },
         logout () {
+            this.loading = true
             const token = JSON.parse(localStorage.getItem('token'))
             axios
             .post('/api/v1/oauth/revoke',
