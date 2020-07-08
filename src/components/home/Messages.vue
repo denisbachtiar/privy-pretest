@@ -34,34 +34,59 @@
         </div>
             <v-textarea
           outlined
+          v-model="message"
           name="input-7-4"
           label="Your message"
-          value="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard"
         ></v-textarea>
         <v-btn
         color="primary"
         class="d-block ml-auto"
         dark
         right
-        @click="showDialog()"
+        @click="sendMessage()"
       >
       Send
       </v-btn>
         </v-container>
       </v-card>
+      <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      top="top"
+    >
+      {{ textSnackbar }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="green"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+
     </v-dialog>
 </template>
 
 <script>
 import axios from 'axios'
   export default {
+      props: {
+        userId: String
+      },
     data () {
       return {
         dialog: false,
         notifications: false,
         sound: true,
         widgets: false,
-        message: null
+        message: null,
+        snackbar: false,
+        textSnackbar: '',
+        timeout: 2000,
       }
     },
     created() {
@@ -88,11 +113,13 @@ import axios from 'axios'
             axios
             .post('/api/v1/message/send',
             {
-                user_id: null,
+                user_id: this.userId,
                 message: this.message,
             }, {headers: {Authorization: token}})
-            .then(() => {
-                // console.log(response)
+            .then(response => {
+                console.log(response.data.data)
+                this.textSnackbar = response.data.data
+                this.snackbar = true
                 // console.log(this.userId)
             })
             .catch(error => {

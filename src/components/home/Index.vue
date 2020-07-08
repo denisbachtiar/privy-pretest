@@ -65,7 +65,7 @@
         >
     <v-icon>mdi-message-text</v-icon>
     </v-btn>
-    <Messages/>
+    <Messages :userId="userData.id"/>
   </v-card>
 </template>
 
