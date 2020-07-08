@@ -11,6 +11,7 @@
         color="primary"
         class=""
         dark
+        x-small
         @click="showDialog()"
       >
       Edit
@@ -52,18 +53,24 @@
           ></v-text-field>
           <v-menu
           ref="menu1"
+          v-model="menu1"
+          :close-on-content-click="false"
           transition="scale-transition"
           offset-y
           max-width="290px"
           min-width="290px"
         >
-          <template v-slot:activator="{}">
+          <template v-slot:activator="{ on, attrs }">
             <v-text-field
+              v-model="graduation_time"
               label="Graduation Time"
               persistent-hint
               prepend-icon="event"
+              v-bind="attrs"
+              v-on="on"
             ></v-text-field>
           </template>
+          <v-date-picker v-model="graduation_time" no-title @input="menu1 = false"></v-date-picker>
         </v-menu>
           </v-container>
 
@@ -87,6 +94,7 @@ export default {
             icons: {
                 mdiPencil
             },
+            menu1: false,
             schoolName: null,
             graduation_time: null,
             dialog: false,
@@ -95,6 +103,7 @@ export default {
     methods: {
         showDialog () {
             this.schoolName = this.userData.school_name
+            this.graduation_time = this.userData.graduation_time
             this.dialog = true
         },
         updateData () {
@@ -103,7 +112,7 @@ export default {
             .post('/api/v1/profile/education',
             {
                 school_name: this.schoolName,
-                graduation_time: '2010-08-09',
+                graduation_time: this.graduation_time,
             }, {headers: {Authorization: token}})
             .then(() => {
                 // console.log(response)

@@ -105,12 +105,11 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
-              v-model="dateFormatted"
+              v-model="date"
               label="Birthdate"
               persistent-hint
               prepend-icon="event"
               v-bind="attrs"
-              @blur="date = parseDate(dateFormatted)"
               v-on="on"
             ></v-text-field>
           </template>
@@ -138,11 +137,9 @@ import axios from 'axios'
     props: {
       userData: Object
     },
-    data: vm => ({
-      date: new Date().toISOString().substr(0, 10),
-      dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
+    data: () => ({
+      date: null,
       menu1: false,
-      menu2: false,
       dialog: false,
       name: null,
       hometown: null,
@@ -160,18 +157,6 @@ import axios from 'axios'
         ]
     }),
 
-    computed: {
-      computedDateFormatted () {
-        return this.formatDate(this.date)
-      },
-    },
-
-    watch: {
-      date () {
-        this.dateFormatted = this.formatDate(this.date)
-      },
-    },
-
     methods: {
       updateData () {
         var genderSave = null
@@ -187,7 +172,7 @@ import axios from 'axios'
           {
             name: this.name,
             gender: genderSave,
-            birthday: '1995-08-09',
+            birthday: this.date,
             hometown: this.hometown,
             bio: this.bio
           }, {headers: {Authorization: token}})
@@ -204,22 +189,10 @@ import axios from 'axios'
       openDialog () {
         this.name = this.userData.name
         this.gender = this.userData.gender
-        this.dateFormatted = this.userData.birthday
+        this.date = this.userData.birthday
         this.hometown = this.userData.hometown
         this.bio = this.userData.bio
         this.dialog = true
-      },
-      formatDate (date) {
-        if (!date) return null
-
-        const [year, month, day] = date.split('-')
-        return `${month}/${day}/${year}`
-      },
-      parseDate (date) {
-        if (!date) return null
-
-        const [month, day, year] = date.split('/')
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
       },
     },
   }

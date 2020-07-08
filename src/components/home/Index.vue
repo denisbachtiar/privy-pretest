@@ -1,15 +1,26 @@
 <template>
     <v-card color="basil">
-    <v-card-title class="text-center justify-center py-6 title-banner" v-bind:style="{'background-image': 'url('+userData.cover_picture.url+')'}">
-    <v-btn class="ma-2 btn-edit" color="orange" @click="showDialogSetting()" dark>
+    <v-card-title class="text-center justify-center py-6 title-banner" v-bind:style="{ 'background-image': 'url(' +imgCover+ ')' }">
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+    <v-btn class="ma-2 btn-edit" fab small color="orange" v-bind="attrs" v-on="on" @click="showDialogSetting()" dark>
         <v-icon dark>mdi-pencil</v-icon>
       </v-btn>
+       </template>
+      <span>Edit profile picture</span>
+    </v-tooltip>
     <div>
-        <img :src="userData.user_picture.picture.url" width="100">
+        <img :src="userData.user_picture == null ? 'https://www.manufacturingusa.com/sites/manufacturingusa.com/files/default.png': userData.user_picture.picture.url" class="user-picture">
     </div>
-      <v-btn class="ma-2 btn-logout" @click="logout()" color="red" dark>
+
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+      <v-btn class="ma-2 btn-logout" fab small v-bind="attrs" v-on="on" @click="logout()" color="red" dark>
         <v-icon dark>mdi-logout</v-icon>
       </v-btn>
+        </template>
+      <span>Logout</span>
+    </v-tooltip>
     </v-card-title>
 
     <v-tabs
@@ -43,6 +54,18 @@
       </v-tab-item>
     </v-tabs-items>
     <Setting :userData="userData"/>
+     <v-btn
+        color="pink"
+        dark
+        fixed
+        bottom
+        right
+        fab
+        @click="openMessageDialog()"
+        >
+    <v-icon>mdi-message-text</v-icon>
+    </v-btn>
+    <Messages/>
   </v-card>
 </template>
 
@@ -53,6 +76,7 @@ import Profile from './Profile'
 import Educations from './Educations'
 import Careers from './Careers'
 import Setting from './Setting'
+import Messages from './Messages'
  import {
     mdiPencil
   } from '@mdi/js'
@@ -61,7 +85,8 @@ import Setting from './Setting'
         Profile,
         Educations,
         Careers,
-        Setting
+        Setting,
+        Messages
     },
     data () {
       return {
@@ -72,7 +97,8 @@ import Setting from './Setting'
         items: [
           'Profile', 'Educations', 'Career'
         ],
-        userData: {}
+        userData: {},
+        imgCover: null
       }
     },
     created() {
@@ -85,8 +111,14 @@ import Setting from './Setting'
             axios
             .get('/api/v1/profile/me', {headers:{Authorization:token}})
             .then(response => {
-                console.log(response)
+                // console.log(response)
                 this.userData = response.data.data.user
+                if (this.userData.cover_picture.url == null) {
+                this.imgCover = 'https://tilemegamart.com.au/wp-content/uploads/woocommerce-placeholder-600x600.png'
+                }
+                else {
+                    this.imgCover = this.userData.cover_picture.url
+                }
                 // console.log(this.userId)
             })
             .catch(error => {
@@ -94,28 +126,39 @@ import Setting from './Setting'
             })
         },
         logout () {
-            this.$store.dispatch('logout')
+            const token = JSON.parse(localStorage.getItem('token'))
+            axios
+            .post('/api/v1/oauth/revoke',
+            {
+                access_token: token,
+                confirm: 1,
+            })
+            .then(response => {
+                console.log(response)
+                this.$store.dispatch('logout')
+                // console.log(this.userId)
+            })
+            .catch(error => {
+                console.log(error.response.data.error.errors[0])
+                this.$store.dispatch('logout')
+            })
         },
         showDialogSetting () {
             this.$root.$refs.Setting.showDialog()
+        },
+        openMessageDialog () {
+            this.$root.$refs.Messages.openDialog();
         }
     },
   }
 </script>
 
 <style lang="scss">
-    .header {
-        height: 30vh;
-        position: relative;
-        .img-header {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translate(-50%, 0);
-            width: 20%;
-            height: 90%;
-            background-color: black;
-        }
+    .user-picture {
+        border-radius: 50%;
+        box-shadow: 0px 0px 6px 1px #888888;
+        width: 110px;
+        height: 110px;
     }
     .title-banner {
         background-repeat: no-repeat;
@@ -126,13 +169,11 @@ import Setting from './Setting'
                 position: absolute;
                 top: 15px;
                 left: 15px;
-                width: 40px;
         }
         .btn-logout {
                 position: absolute;
                 top: 15px;
                 right: 15px;
-                width: 40px;
         }
     }
     .v-card>.v-card__progress+:not(.v-btn):not(.v-chip), .v-card>:first-child:not(.v-btn):not(.v-chip) {

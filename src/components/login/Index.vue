@@ -1,6 +1,6 @@
 <template>
 <div class="box-auth">
-<h1>Login</h1>
+<h1 class="mb-4">Login</h1>
   <v-row justify="center">
     <v-form
       ref="form"
@@ -35,13 +35,6 @@
         required
       ></v-text-field>
 
-    <v-text-field
-        v-model="country"
-        label="Indonesia"
-        disabled
-        required
-      ></v-text-field>
-
       <v-btn
         :disabled="!valid"
         color="success"
@@ -49,7 +42,13 @@
         type="submit"
         @click="validate"
       >
-        Submit
+        <v-progress-circular
+        indeterminate
+        size="20"
+        color="white"
+        v-if="loading"
+        ></v-progress-circular>
+        <span v-else>Submit</span>
       </v-btn>
       <p class="mt-2">Belum punya akun? <router-link :to="{ name: 'Register' }">Register</router-link></p>
     </v-form>
@@ -78,7 +77,7 @@ import axios from 'axios'
             v => !!v || 'Required',
           v => (v && v.length >= 5) || 'Password must be more than 5 characters',
       ],
-      country: ''
+      loading: false
     }),
     created() {
     },
@@ -87,6 +86,7 @@ import axios from 'axios'
         this.$refs.form.validate()
       },
       login () {
+          this.loading = true
           axios
           .post('/api/v1/oauth/sign_in',
           {
@@ -101,8 +101,10 @@ import axios from 'axios'
             //   console.log(response)
             this.$store.commit('setToken', {token: response.data.data.user.access_token})
             this.$router.push({name: 'Home'})
+            // this.loading = false
           })
           .catch(error => {
+              this.loading = false
               this.alert.status = true
               this.alert.text = error.response.data.error.errors[0]
             console.log(error.response.data.error.errors[0])
@@ -129,5 +131,16 @@ import axios from 'axios'
         font-size: medium !important;
         color: coral;
         margin-top: -2px;
+    }
+
+    @media only screen and (max-width: 900px) {
+            .v-form {
+                min-width: 50%;
+            }
+    }
+    @media only screen and (max-width: 600px) {
+            .v-form {
+                min-width: 70%;
+            }
     }
 </style>

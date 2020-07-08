@@ -1,7 +1,6 @@
 <template>
 <div class="box-form">
     <h3>Masukkan OTP yang telah dikirim ke No Handphone anda:</h3>
-    <p>{{otpDataUser}}</p>
     <v-form class="mb-1" @submit.prevent="register">
         <v-row>
         <v-col cols="12" sm="6" md="3">
@@ -46,7 +45,13 @@
         color="success"
         type="submit"
       >
-        Submit
+        <v-progress-circular
+        indeterminate
+        size="20"
+        color="white"
+        v-if="loading"
+        ></v-progress-circular>
+        <span v-else>Submit</span>
       </v-btn>
     </v-form>
 </div>
@@ -64,8 +69,9 @@ export default {
             two: null,
             three: null,
             four: null,
-            countDown: 3,
-            resend: false
+            countDown: 15,
+            resend: false,
+            loading: false
         }
     },
     created() {
@@ -103,6 +109,7 @@ export default {
                 }
             },
         register () {
+            this.loading = true
           axios
           .post('/api/v1/register/otp/match',
           {
@@ -116,6 +123,7 @@ export default {
             // console.log(this.userId)
           })
           .catch(error => {
+              this.loading = false
             console.log(error.response.data.error.errors[0])
           })
       }

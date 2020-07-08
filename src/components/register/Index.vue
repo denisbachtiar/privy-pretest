@@ -1,6 +1,6 @@
 <template>
 <div class="box-auth">
-<h1 v-if="otpForm == false">Register</h1>
+<h1 v-if="otpForm == false" class="mb-4">Register</h1>
   <v-row justify="center" v-if="otpForm == false">
     <v-form
       ref="form"
@@ -49,7 +49,13 @@
         type="submit"
         @click="validate"
       >
-        Submit
+      <v-progress-circular
+        indeterminate
+        size="20"
+        color="white"
+        v-if="loading"
+        ></v-progress-circular>
+        <span v-else>Submit</span>
       </v-btn>
       <p class="mt-2">Sudah punya akun? <router-link :to="{ name: 'Login' }">Login</router-link></p>
     </v-form>
@@ -83,7 +89,8 @@ import Otp from './Otp.vue'
             v => !!v || 'Required',
           v => (v && v.length >= 5) || 'Password must be more than 5 characters',
       ],
-      country: ''
+      country: '',
+      loading: false
     }),
     created() {
         this.$root.$refs.Register = this;
@@ -93,6 +100,7 @@ import Otp from './Otp.vue'
         this.$refs.form.validate()
       },
       register () {
+            this.loading = true
           axios
           .post('/api/v1/register',
           {
@@ -107,10 +115,12 @@ import Otp from './Otp.vue'
             //   console.log(response)
             this.otpDataUser = response.data.data.user
             this.otpForm = true
+            this.loading = false
             // console.log(this.userId)
           })
           .catch(error => {
               this.alert.status = true
+              this.loading = false
               this.alert.text = error.response.data.error.errors[0]
             console.log(error.response.data.error.errors[0])
           })
@@ -136,5 +146,15 @@ import Otp from './Otp.vue'
         font-size: medium !important;
         color: coral;
         margin-top: -2px;
+    }
+    @media only screen and (max-width: 900px) {
+            .v-form {
+                min-width: 50%;
+            }
+    }
+    @media only screen and (max-width: 600px) {
+            .v-form {
+                min-width: 70%;
+            }
     }
 </style>

@@ -31,20 +31,45 @@
 
           <v-container class="mt-3">
             <div class="img-cover" v-bind:style="{'background-image': 'url('+cover+')'}"><input type="file" v-show="false" ref="imgcover" @change="onFileChange" />
-            <v-btn class="ma-2 btn-edit" color="orange" @click="$refs.imgcover.click()" small dark><v-icon dark>mdi-pencil</v-icon></v-btn></div>
+            <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn class="ma-2 btn-edit" color="orange" v-bind="attrs" v-on="on" @click="$refs.imgcover.click()" small dark><v-icon dark>mdi-pencil</v-icon></v-btn>
+            </template>
+            <span>Update cover</span>
+            </v-tooltip>    
+            </div>
+            <h3 align="left" class="mt-3">Profile pictures</h3>
             <v-row>
-                <v-col class="col-4" v-for="(item, index) in userData.user_pictures" :key="index">
+                <v-col class="col-md-4 col-6" v-for="(item, index) in userData.user_pictures" :key="index">
                     <v-card class="pa-2" outlined tile>
                     <div class="img-user" v-bind:style="{'background-image': 'url('+item.picture.url+')'}">
-                    <v-btn class="ma-2 btn-default" @click="defaultImage(item.id)" :color="item.id == userData.user_picture.id ? 'green':'orange'" small dark><v-icon dark>mdi-account</v-icon></v-btn>
-                    <v-btn class="ma-2 btn-delete" @click="deleteImgUser(item.id)" color="red" small dark><v-icon dark>mdi-delete</v-icon></v-btn>
+
+                    <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn class="ma-2 btn-default" v-bind="attrs" v-on="on" @click="defaultImage(item.id)" :color="item.id == userData.user_picture.id ? 'green':'orange'" small dark><v-icon dark>mdi-account</v-icon></v-btn>
+                    </template>
+                    <span>Set default image</span>
+                    </v-tooltip>
+
+                    <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn class="ma-2 btn-delete" v-bind="attrs" v-on="on" @click="deleteImgUser(item.id)" color="red" small dark><v-icon dark>mdi-delete</v-icon></v-btn>
+                    </template>
+                    <span>Delete image</span>
+                    </v-tooltip>
+
                     </div>
                     </v-card>
                 </v-col>
-                <v-col class="col-4">
+                <v-col class="col-md-4 col-6">
                     <input type="file" v-show="false" ref="imguser" @change="onUserFileChange"/>
                     <v-card class="pa-2" outlined tile @click="$refs.imguser.click()">
-                    <v-btn class="ma-2 btn-plus" color="green" small dark><v-icon dark>mdi-plus</v-icon></v-btn>
+                    <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn class="ma-2 btn-plus" v-bind="attrs" v-on="on" color="green" small dark><v-icon dark>mdi-plus</v-icon></v-btn>
+                    </template>
+                    <span>Add profile picture</span>
+                    </v-tooltip>
                     </v-card>
                 </v-col>
             </v-row>
@@ -73,7 +98,12 @@ export default {
     methods: {
         showDialog () {
             this.dialog = true
-            this.cover = this.userData.cover_picture.url
+            if (this.userData.cover_picture.url == null) {
+                this.cover = 'https://tilemegamart.com.au/wp-content/uploads/woocommerce-placeholder-600x600.png'
+            }
+            else {
+                this.cover = this.userData.cover_picture.url
+            }
         },
         onFileChange(e) {
             const file = e.target.files[0];
@@ -84,8 +114,7 @@ export default {
             const token = JSON.parse(localStorage.getItem('token'))
             axios
             .post('/api/v1/uploads/cover', data, {headers: {Authorization: token, 'content-type': 'multipart/form-data'}})
-            .then(response => {
-                console.log(response)
+            .then(() => {
                 this.$root.$refs.Home.dataFetch();
                 // console.log(this.userId)
             })
@@ -100,8 +129,8 @@ export default {
             const token = JSON.parse(localStorage.getItem('token'))
             axios
             .post('/api/v1/uploads/profile', data, {headers: {Authorization: token, 'content-type': 'multipart/form-data'}})
-            .then(response => {
-                console.log(response)
+            .then(() => {
+                // console.log(response)
                 this.$root.$refs.Home.dataFetch();
                 // console.log(this.userId)
             })
@@ -113,8 +142,8 @@ export default {
             const token = JSON.parse(localStorage.getItem('token'))
             axios
             .delete('/api/v1/uploads/profile', {data: {id: idUser}}, {headers: {Authorization: token}})
-            .then(response => {
-                console.log(response)
+            .then(() => {
+                // console.log(response)
                 this.$root.$refs.Home.dataFetch();
                 // console.log(this.userId)
             })
@@ -126,8 +155,8 @@ export default {
             const token = JSON.parse(localStorage.getItem('token'))
             axios
             .post('/api/v1/uploads/profile/default', {id: idUser}, {headers: {Authorization: token}})
-            .then(response => {
-                console.log(response)
+            .then(() => {
+                // console.log(response)
                 this.$root.$refs.Home.dataFetch();
                 // console.log(this.userId)
             })
@@ -139,7 +168,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scope>
     .img-cover {
         background-repeat: no-repeat;
         background-position: center; 
@@ -160,7 +189,6 @@ export default {
         background-size: cover;
         width: 100%;
         height: 150px;
-        cursor: pointer;
         position: relative;
         .btn-delete {
             position: absolute;
@@ -174,7 +202,7 @@ export default {
         }
     }
     .v-card {
-        min-height: 180px;
+        min-height: 180px !important;
         position: relative;
         .btn-plus {
             position: absolute;

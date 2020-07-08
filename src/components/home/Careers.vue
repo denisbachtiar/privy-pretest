@@ -4,12 +4,13 @@
         <v-list-item two-line>
             <v-list-item-content>
                 <v-list-item-title v-text="userData.company_name == null ? 'kosong': userData.company_name"></v-list-item-title>
-                <v-list-item-subtitle>{{userData.starting_from}} - {{userData.ending_in}}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{userData.starting_from}} ~ {{userData.ending_in}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
         <v-btn
         color="primary"
         class="ma-2"
+        x-small
         dark
         @click="showDialog()"
       >
@@ -46,27 +47,51 @@
           </v-toolbar>
 
           <v-container class="mt-3">
-            <v-text-field
+          <v-text-field
             v-model="companyName"
             label="Company Name"
           ></v-text-field>
+
           <v-menu
-          ref="menu1"
+          ref="menu"
+          v-model="menu"
+          :close-on-content-click="false"
           transition="scale-transition"
           offset-y
           max-width="290px"
           min-width="290px"
         >
-          <template v-slot:activator="{}">
+          <template v-slot:activator="{ on, attrs }">
             <v-text-field
-              label="Start"
+              v-model="dateRangeText"
+              label="Start to end"
               persistent-hint
               prepend-icon="event"
+              v-bind="attrs"
+              v-on="on"
+              readonly
             ></v-text-field>
           </template>
+          <v-date-picker v-model="dates" no-title range>
+            <v-spacer></v-spacer>
+          <v-btn
+            text
+            color="primary"
+            @click="menu = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            text
+            color="primary"
+            @click="$refs.menu.save(date)"
+          >
+            OK
+          </v-btn>
+          </v-date-picker>
         </v-menu>
-          </v-container>
 
+          </v-container>
           <div style="flex: 1 1 auto;"></div>
         </v-card>
       </v-dialog>
@@ -87,16 +112,21 @@ export default {
             icons: {
                 mdiPencil
             },
-            position: null,
+            menu: false,
             companyName: null,
-            start: null,
-            end: null,
+            dates: [],
             dialog: false,
         }
+    },
+    computed: {
+        dateRangeText () {
+            return this.dates.join(' ~ ')
+        },
     },
     methods: {
         showDialog () {
             this.companyName = this.userData.company_name
+            this.dates = [this.userData.starting_from, this.userData.ending_in]
             this.dialog = true
         },
         updateData () {
@@ -104,10 +134,10 @@ export default {
             axios
             .post('/api/v1/profile/career',
             {
-                position: this.position,
+                position: 'Other',
                 company_name: this.companyName,
-                starting_from: '2010-08-09',
-                ending_in: '2012-08-09',
+                starting_from: this.dates[0],
+                ending_in: this.dates[1],
             }, {headers: {Authorization: token}})
             .then(() => {
                 // console.log(response)
